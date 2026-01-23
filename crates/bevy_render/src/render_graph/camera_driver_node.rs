@@ -54,7 +54,15 @@ impl Node for CameraDriverNode {
                 }
             }
             if run_graph {
-                graph.run_sub_graph(camera.render_graph, vec![], Some(sorted_camera.entity))?;
+                graph.run_sub_graph(
+                    camera.render_graph,
+                    vec![],
+                    Some(sorted_camera.entity),
+                    Some(format!(
+                        "Camera {} ({})",
+                        sorted_camera.order, sorted_camera.entity
+                    )),
+                )?;
             }
         }
 
@@ -72,7 +80,7 @@ impl Node for CameraDriverNode {
             };
 
             #[cfg(feature = "trace")]
-            let _span = tracing::info_span!("no_camera_clear_pass").entered();
+            let _span = bevy_log::info_span!("no_camera_clear_pass").entered();
             let pass_descriptor = RenderPassDescriptor {
                 label: Some("no_camera_clear_pass"),
                 color_attachments: &[Some(RenderPassColorAttachment {
@@ -87,6 +95,7 @@ impl Node for CameraDriverNode {
                 depth_stencil_attachment: None,
                 timestamp_writes: None,
                 occlusion_query_set: None,
+                multiview_mask: None,
             };
 
             render_context
